@@ -1,0 +1,28 @@
+# Dependencias
+/node_modules/
+
+
+# Archivos de configuración local
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Directorios de caché
+/.vite/
+/.vite-plugin-react/
+
+# Directorios de salida
+/dist/
+/build/
+/public/build/
+/out/
+
+# Archivos de compilación
+*.log
+*.cache
+*.tmp
+
+
+

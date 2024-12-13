@@ -1,0 +1,85 @@
+name: sincro
+
+on:
+  push:
+    branches: 
+      - main
+  pull_request: 
+    branches: 
+      - main
+
+jobs:
+  back:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v2
+
+      - name: Configurar Node.js para back
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'v20.12.2'
+
+      - name: Instalar dependencias de back
+        run: |
+          cd Backend
+          npm ci
+
+      - name: Login en Docker Hub para back
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Construir y Push de la imagen Docker para back
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/backend:latest ./Backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
+
+  front:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v2
+
+      - name: Configurar Node.js para front
+        uses: actions/setup-node@v3
+        with:
+          node-version: 'v20.12.2'
+
+      - name: Instalar dependencias de front
+        run: |
+          cd Frontend
+          npm ci
+
+      - name: Login en Docker Hub para front
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Construir y Push de la imagen Docker para front
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./Frontend
+          docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v2
+
+      - name: Conectar a Hostinger y desplegar imágenes
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          password: ${{ secrets.HOSTINGER_PASSWORD }}
+          script: |
+            # Pull de las últimas imágenes desde Docker Hub
+            docker pull ${{ secrets.DOCKER_USERNAME }}/backend:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+
+            # Correr los contenedores en el servidor Hostinger
+            docker run -d --name backend -p 3001:3001 ${{ secrets.DOCKER_USERNAME }}/backend:latest
+            docker run -d --name frontend -p 80:80 ${{ secrets.DOCKER_USERNAME }}/frontend:latest

@@ -1,0 +1,19 @@
+# Dependencias
+/node_modules/
+
+
+# Archivos de configuración local
+.env
+
+# Directorios de caché
+/dist/
+/build/
+
+# Archivos de compilación
+*.log
+*.cache
+*.tmp
+
+
+# Archivos de debug
+npm-debug.log*

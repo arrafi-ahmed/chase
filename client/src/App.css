@@ -1,0 +1,18 @@
+#root {
+  max-width: 1280px;
+  box-sizing: border-box;
+  text-align: center;
+  color: #98a1b4;
+  margin: 0 auto ;
+  
+}
+
+.none{
+  
+  color: #f0efef;
+}
+/* 
+body{
+
+  background-color:#F7F9FB;
+} */
